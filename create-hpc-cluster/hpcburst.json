@@ -58,6 +58,7 @@
         "storageAccountType": "Standard_LRS",
         "saCount": 5,
         "namingInfix": "[toLower(parameters('vmssName'))]",
+		"namingInfix1": "[toLower(concat(parameters('vmssName'), '1'))]",
         "newStorageAccountSuffix": "[concat(variables('namingInfix'), 'sa')]",
         "uniqueStringArray": [
             "[concat(uniqueString(concat(resourceGroup().id, deployment().name, variables('newStorageAccountSuffix'), '0')))]",
@@ -276,6 +277,83 @@
             },            
             "osProfile": {
               "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": "true",
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[variables('subnetID')]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[variables('backendAddressPoolID')]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[variables('natRDPPoolID')]"
+                            },
+                            {
+                              "id": "[variables('natWinRMPoolID')]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+	  {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix1')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "[variables('computeApi')]",
+        "dependsOn": [
+          "storageLoop",
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "properties": {
+          "overprovision": "true",
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "vhdContainers": [
+                  "[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                  "[concat('https://', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                  "[concat('https://', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                  "[concat('https://', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                  "[concat('https://', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+                ],
+                "name": "[variables('osDiskName')]",
+                "caching": "ReadOnly",
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]"
+            },            
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix1')]",
               "adminUsername": "[parameters('adminUsername')]",
               "adminPassword": "[parameters('adminPassword')]"
             },
