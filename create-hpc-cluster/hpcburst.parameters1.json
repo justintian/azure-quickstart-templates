@@ -1,7 +1,4 @@
 {
-        "domainNamePrefix": {
-            "value": "armhpc"
-        },
         "vmssName": {
             "value": "armhpc"
         },
