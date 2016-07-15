@@ -228,7 +228,7 @@
         "location": "[resourceGroup().location]",
         "apiVersion": "[variables('computeApi')]",
         "dependsOn": [
-          "storageLoop",
+          "[concat('Microsoft.Storage/storageAccounts/', variables('newStorageAccount'))]",
           "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
           "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
         ],
