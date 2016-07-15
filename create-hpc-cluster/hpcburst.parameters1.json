@@ -1,0 +1,17 @@
+{
+        "domainNamePrefix": {
+            "value": "armhpc"
+        },
+        "vmssName": {
+            "value": "armhpc"
+        },
+        "adminUsername": {
+            "value": "azureuser"
+        },
+        "adminPassword": {
+            "value": "!!123abc"
+        },
+        "instanceCount": {
+            "value": 2
+        }
+}
